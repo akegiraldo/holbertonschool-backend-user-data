@@ -8,7 +8,12 @@ from typing import List, TypeVar
 class Auth:
 
     def require_auth(self, path: str, excluded_paths: List[str]) -> bool:
-        return False
+        if path is None or not excluded_paths:
+            return True
+
+        new_path = path[0:len(path) - 1] if path[-1] == '/' else path + '/'
+
+        return path not in excluded_paths and new_path not in excluded_paths
 
     def authorization_header(self, request=None) -> str:
         return None
