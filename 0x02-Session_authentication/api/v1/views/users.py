@@ -27,12 +27,14 @@ def view_one_user(user_id: str = None) -> str:
     """
     if user_id is None:
         abort(404)
-    user = User.get(user_id)
 
-    if user == request.current_user and not request.current_user:
+    current_user = request.current_user
+    if user_id == 'me' and not current_user:
         abort(404)
-    elif user == request.current_user and request.current_user:
-        return jsonify(user.to_json())
+    elif user_id == 'me' and current_user:
+        return jsonify(current_user.to_json())
+
+    user = User.get(user_id)
 
     if user is None:
         abort(404)
@@ -126,9 +128,3 @@ def update_user(user_id: str = None) -> str:
         user.last_name = rj.get('last_name')
     user.save()
     return jsonify(user.to_json()), 200
-
-
-@app_views.route('/users/me', methods=['GET'], strict_slashes=False)
-def me_user():
-    """Function that retrieve the authenticated User object"""
-    return jsonify(request.current_user.to_json())
